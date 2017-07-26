@@ -27,7 +27,7 @@
                 <th></th>
             </tr>
             {% for phone in form.phones %}
-                <tr data-toggle="fieldset-entry">
+                <tr data-toggle="fieldset-entry" {% if loop.index0==0 %}style="display:none;"{% endif %}>
                     <td>{{ phone.phone_number }}</td>
                     <td>{{ phone.phone_name }}</td>
                     <td><button type="button" data-toggle="fieldset-remove-row" id="phone-{{loop.index0}}-remove">-</button></td>

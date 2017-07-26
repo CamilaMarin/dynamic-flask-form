@@ -4,7 +4,7 @@ $(function() {
             
         //Add new entry
         $this.find("button[data-toggle=fieldset-add-row]").click(function() {
-            var target = $($(this).data("target"))
+            var target = $($(this).data("target"));
             console.log(target);
             var oldrow = target.find("[data-toggle=fieldset-entry]:last");
             var row = oldrow.clone(true, true);
@@ -17,6 +17,7 @@ $(function() {
                 var id = $(this).attr('id').replace('-' + (elem_num - 1) + '-', '-' + (elem_num) + '-');
                 $(this).attr('name', id).attr('id', id).val('').removeAttr("checked");
             });
+            row.show();
             oldrow.after(row);
         }); //End add new entry
 

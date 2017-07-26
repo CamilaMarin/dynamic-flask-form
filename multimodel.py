@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, flash
+from flask import request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.wtf import Form
 from wtforms import FieldList
@@ -44,7 +45,7 @@ class PhoneForm(NoCsrfForm):
 class CombinedForm(Form):
     username = StringField('User', validators=[DataRequired()])
     # we must provide empth Phone() instances else populate_obj will fail
-    phones = FieldList(FormField(PhoneForm, default=lambda: Phone()))
+    phones = FieldList(FormField(PhoneForm, default=lambda: Phone()), min_entries=1)
     submit = SubmitField('Submit')
 
 
@@ -54,18 +55,17 @@ def index():
     # always "blindly" load the user
     user = User.query.first()
 
-    # if User has no phones, provide an empty one so table is rendered
-    if len(user.phones) == 0:
-        user.phones = [Phone(phone_number="example")]
-        flash("empty Phone provided")
-
-    # else: forms loaded through db relation
+    # forms loaded through db relation
     form = CombinedForm(obj=user)
 
-    if form.validate_on_submit():
-        form.populate_obj(user)
-        db.session.commit()
-        flash("Saved Changes")
+    if request.method == 'POST':
+        # remove the hidden first entry (to be able to have no entries)
+        hidden_entry = form.phones.entries.pop(0)
+        if form.validate_on_submit():
+            form.populate_obj(user)
+            db.session.commit()
+            flash("Saved Changes")
+        form.phones.entries.insert(0, hidden_entry)
     return render_template('multi.html', form=form)
 
 
